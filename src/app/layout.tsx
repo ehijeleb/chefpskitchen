@@ -64,10 +64,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbf2e3" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f0f0f" },
-  ],
+  // Light is the default theme, so the browser chrome matches cream.
+  themeColor: "#fbf2e3",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
