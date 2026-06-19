@@ -49,7 +49,6 @@ export function EnquiryForm() {
   const [touched, setTouched] = useState<Partial<Record<keyof Values, boolean>>>({});
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [serverError, setServerError] = useState<string | null>(null);
-  const [serverFieldErrors, setServerFieldErrors] = useState<EnquiryFieldErrors>({});
   const refs = useRef<Partial<Record<keyof Values, HTMLElement | null>>>({});
 
   // Live client-side validation (display gated by `touched`).
@@ -59,14 +58,11 @@ export function EnquiryForm() {
   }, [values]);
 
   function errorFor(field: keyof EnquiryInput): string | undefined {
-    return serverFieldErrors[field] ?? (touched[field] ? clientErrors[field] : undefined);
+    return touched[field] ? clientErrors[field] : undefined;
   }
 
   function set(field: keyof Values, value: string) {
     setValues((v) => ({ ...v, [field]: value }));
-    if (serverFieldErrors[field]) {
-      setServerFieldErrors((e) => ({ ...e, [field]: undefined }));
-    }
   }
 
   function blur(field: keyof Values) {
@@ -76,7 +72,6 @@ export function EnquiryForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setServerError(null);
-    setServerFieldErrors({});
 
     const parsed = enquirySchema.safeParse(values);
     if (!parsed.success) {
@@ -87,29 +82,53 @@ export function EnquiryForm() {
       return;
     }
 
+    // Honeypot tripped — pretend success so bots get no signal.
+    if (parsed.data.company) {
+      setStatus("success");
+      return;
+    }
+
+    const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
+    if (!accessKey) {
+      setServerError(
+        "The enquiry form isn't connected yet. Please email hello@chefpskitchen.co.uk and we'll get right back to you.",
+      );
+      setStatus("error");
+      return;
+    }
+
+    const d = parsed.data;
     setStatus("submitting");
     try {
-      const res = await fetch("/api/enquiry", {
+      // Web3Forms requires client-side submission on the free plan. The access
+      // key is public by design; spam is handled by the honeypots below + any
+      // captcha enabled in the Web3Forms dashboard.
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parsed.data),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          access_key: accessKey,
+          subject: `New enquiry — ${d.eventType} — ${d.name}`,
+          from_name: "Chef P's Kitchen website",
+          name: d.name,
+          email: d.email,
+          phone: d.phone || "Not given",
+          event_type: d.eventType,
+          event_date: d.eventDate || "Not given",
+          guest_count: typeof d.guestCount === "number" ? d.guestCount : "Not given",
+          location: d.location || "Not given",
+          message: d.message,
+          botcheck: "", // Web3Forms' own honeypot
+        }),
       });
-      const data = await res.json().catch(() => ({}));
+      const result = await res.json().catch(() => ({}));
 
-      if (res.ok && data.ok) {
+      if (res.ok && result.success) {
         setStatus("success");
         return;
       }
-      if (res.status === 422 && data.fieldErrors) {
-        setServerFieldErrors(data.fieldErrors);
-        setTouched(Object.fromEntries(FIELD_ORDER.map((f) => [f, true])));
-        const first = FIELD_ORDER.find((f) => data.fieldErrors[f]);
-        if (first) refs.current[first]?.focus();
-        setStatus("idle");
-        return;
-      }
       setServerError(
-        data.error ?? "Something went wrong. Please try again, or email hello@chefpskitchen.co.uk.",
+        "Something went wrong sending your enquiry. Please try again, or email hello@chefpskitchen.co.uk.",
       );
       setStatus("error");
     } catch {
