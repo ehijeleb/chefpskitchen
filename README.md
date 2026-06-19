@@ -44,7 +44,7 @@ See `.env.example` for the full list. Summary:
 | Variable | Required | Notes |
 | --- | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | yes | No trailing slash. Drives canonical URLs, OG, sitemap. Use the `*.vercel.app` URL for now, swap to `chefpskitchen.co.uk` later. |
-| `WEB3FORMS_ACCESS_KEY` | for the form | Free access key from [web3forms.com](https://web3forms.com). Enquiries are emailed to the address you used to create the key. Read server-side only. |
+| `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` | for the form | Free access key from [web3forms.com](https://web3forms.com). Enquiries are emailed to the address you used to create the key. Public by design (Web3Forms' free plan submits from the browser). |
 
 Secrets live in `.env.local` (gitignored). `.env*` is covered by `.gitignore`; only
 `.env.example` is committed.
@@ -56,14 +56,16 @@ Secrets live in `.env.local` (gitignored). `.env*` is covered by `.gitignore`; o
 The form emails each enquiry straight to your inbox. No database.
 
 1. Go to [web3forms.com](https://web3forms.com), enter the email you want enquiries sent
-   to, and they email you a free **access key**.
-2. Put it in `.env.local` as `WEB3FORMS_ACCESS_KEY=...` (and in Vercel's env settings for
-   production).
+   to, and they email you a free **access key**. (On first use Web3Forms sends a one-time
+   verification email — confirm it so enquiries start arriving.)
+2. Put it in `.env.local` as `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY=...` (and in Vercel's env
+   settings for production).
 
-**How it flows:** the browser validates with `zod`, posts to the server route
-(`src/app/api/enquiry/route.ts`), which re-validates, checks the honeypot, then forwards to
-Web3Forms server-side. The access key stays on the server and never ships to the client.
-With no key, the form still validates but returns a friendly "please email us" message
+**How it flows:** the browser validates with `zod`, then posts directly to Web3Forms.
+Web3Forms' free plan only accepts browser submissions, so the access key is `NEXT_PUBLIC_`
+(public by design — it just names which inbox to email). Spam is handled by two honeypots
+(`company` + Web3Forms' `botcheck`) and any captcha you enable in the Web3Forms dashboard.
+With no key, the form still validates but shows a friendly "please email us" message
 instead of sending.
 
 > Note: this is email-only, so there is no saved record if an email ever bounces or is
@@ -78,8 +80,8 @@ instead of sending.
 1. Push this repo to GitHub.
 2. Import it into Vercel (framework auto-detected as Next.js).
 3. Add the environment variables from `.env.example` in the Vercel project settings
-   (`NEXT_PUBLIC_SITE_URL` and `WEB3FORMS_ACCESS_KEY`). Set `NEXT_PUBLIC_SITE_URL` to your
-   deployment URL.
+   (`NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`). Set
+   `NEXT_PUBLIC_SITE_URL` to your deployment URL.
 4. Deploy. No custom domain is required; everything is domain-agnostic. When
    `chefpskitchen.co.uk` is ready, point it at the Vercel project and update
    `NEXT_PUBLIC_SITE_URL`.
@@ -95,7 +97,6 @@ src/
     globals.css           design tokens (light/dark), motion tokens, reveal + hero CSS
     page.tsx              home (signature hero, intro, events, dishes, how-it-works, CTA)
     menu/ events/ about/ enquire/   the inner pages
-    api/enquiry/route.ts  POST handler -> validate -> honeypot -> forward to Web3Forms
     sitemap.ts robots.ts manifest.ts
   components/             Header, Footer, Hero, ThemeToggle, Reveal, DishCard, EnquiryForm, ...
   data/                   menu.ts, events.ts, dishes.ts (content)

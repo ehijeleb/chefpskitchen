@@ -115,10 +115,11 @@ Theme: `ThemeProvider` — inline pre-hydration script sets `data-theme` from `l
 ## 5. Enquiry form + data model
 
 > **Update (post-approval, 2026-06-19):** the client chose **email-only delivery via
-> Web3Forms** instead of a database. Supabase/Resend were removed; the route handler still
-> validates server-side (honeypot included) but now forwards to Web3Forms, which emails the
-> enquiry to the business inbox. The Supabase schema/RLS design below is kept for history in
-> case a persisted store is wanted later. See `README.md` → "Enquiry delivery".
+> Web3Forms** instead of a database. Supabase/Resend were removed. Web3Forms' free plan only
+> accepts browser submissions, so the form validates with zod + honeypots client-side, then
+> posts directly to Web3Forms (the `/api/enquiry` route was removed). The access key is
+> `NEXT_PUBLIC_` (public by design). The Supabase schema/RLS design below is kept for history
+> in case a persisted store is wanted later. See `README.md` → "Enquiry delivery".
 
 **Fields:** name* · email* (validated) · phone (tel) · event type (select: Private dining / Corporate / Wedding-celebration / Pop-up-market / Other) · event date (optional) · guest count (number) · location/postcode · message* (textarea) · `company` honeypot (hidden).
 
