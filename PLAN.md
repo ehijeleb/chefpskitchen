@@ -114,6 +114,12 @@ Theme: `ThemeProvider` — inline pre-hydration script sets `data-theme` from `l
 
 ## 5. Enquiry form + data model
 
+> **Update (post-approval, 2026-06-19):** the client chose **email-only delivery via
+> Web3Forms** instead of a database. Supabase/Resend were removed; the route handler still
+> validates server-side (honeypot included) but now forwards to Web3Forms, which emails the
+> enquiry to the business inbox. The Supabase schema/RLS design below is kept for history in
+> case a persisted store is wanted later. See `README.md` → "Enquiry delivery".
+
 **Fields:** name* · email* (validated) · phone (tel) · event type (select: Private dining / Corporate / Wedding-celebration / Pop-up-market / Other) · event date (optional) · guest count (number) · location/postcode · message* (textarea) · `company` honeypot (hidden).
 
 **Behaviour:** labels above inputs; inline validation **on blur**, error beneath field, first invalid field focused after a failed submit; loading → success/error; success confirms next step ("Thanks, we'll be in touch within `// TODO: lead time` — your enquiry's in."); inputs ≥44px; correct `inputmode`/`autocomplete`/keyboard types. Client validation with `zod`, **re-validated server-side** (never trust the client).

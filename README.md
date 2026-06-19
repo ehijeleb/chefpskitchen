@@ -6,8 +6,8 @@ Afrofusion home-catering business (events-first, no dine-in venue).
 Two jobs: showcase the food and credibility, and generate catering enquiries.
 
 - **Stack:** Next.js 15 (App Router, TypeScript) · Tailwind CSS v4 (CSS-variable design
-  tokens) · Supabase (Postgres) for enquiries · optional Resend for notifications ·
-  built for Vercel, domain-agnostic.
+  tokens) · enquiries emailed via **Web3Forms** (no database) · built for Vercel,
+  domain-agnostic.
 - **Design:** light + dark mode (both first-class), Fraunces + Hanken Grotesk type system,
   the brand's golden brush-stroke as a signature hero animation, motion that respects
   `prefers-reduced-motion`.
@@ -22,8 +22,8 @@ cp .env.example .env.local   # then fill in the values you have
 npm run dev                  # http://localhost:3000
 ```
 
-The site runs without any backend config. Until Supabase is set up, the enquiry form
-validates and shows a graceful "service not configured" message instead of saving.
+The site runs without any backend config. Until the Web3Forms key is set, the enquiry
+form validates and shows a graceful "service not configured" message instead of sending.
 
 ### Scripts
 
@@ -44,38 +44,32 @@ See `.env.example` for the full list. Summary:
 | Variable | Required | Notes |
 | --- | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | yes | No trailing slash. Drives canonical URLs, OG, sitemap. Use the `*.vercel.app` URL for now, swap to `chefpskitchen.co.uk` later. |
-| `NEXT_PUBLIC_SUPABASE_URL` | for the form | Supabase project URL. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | optional | Publishable key (not used to read enquiries; RLS blocks that). |
-| `SUPABASE_SERVICE_ROLE_KEY` | for the form | **Server-only.** Never prefix with `NEXT_PUBLIC_`. Used only in the route handler to insert enquiries. |
-| `ENQUIRY_NOTIFICATIONS_ENABLED` | no | `true` to enable new-enquiry emails (needs a Resend key too). |
-| `RESEND_API_KEY` | no | Only if notifications are enabled. No key = no email, ever. |
-| `ENQUIRY_NOTIFICATION_TO` / `_FROM` | no | Notification addresses. |
+| `WEB3FORMS_ACCESS_KEY` | for the form | Free access key from [web3forms.com](https://web3forms.com). Enquiries are emailed to the address you used to create the key. Read server-side only. |
 
 Secrets live in `.env.local` (gitignored). `.env*` is covered by `.gitignore`; only
 `.env.example` is committed.
 
 ---
 
-## Supabase setup
+## Enquiry delivery (Web3Forms)
 
-1. Create a Supabase project.
-2. Run the migration in `supabase/migrations/0001_enquiries.sql` (SQL editor, or
-   `supabase db push` with the CLI). It creates the `enquiries` table and enables Row
-   Level Security **with no public policies**.
-3. Copy the project URL + keys into `.env.local`.
+The form emails each enquiry straight to your inbox. No database.
 
-**Security model:** RLS is on with zero policies, so the public/anon client cannot read or
-write enquiries at all. The website writes only through the server route handler
-(`src/app/api/enquiry/route.ts`) using the service-role key, which bypasses RLS. Read
-submissions from the Supabase dashboard. Never expose the service-role key to the client
-(the `src/lib/supabase-server.ts` module imports `server-only` so a build fails if it is
-ever pulled into client code).
+1. Go to [web3forms.com](https://web3forms.com), enter the email you want enquiries sent
+   to, and they email you a free **access key**.
+2. Put it in `.env.local` as `WEB3FORMS_ACCESS_KEY=...` (and in Vercel's env settings for
+   production).
 
-### Optional: email notifications
+**How it flows:** the browser validates with `zod`, posts to the server route
+(`src/app/api/enquiry/route.ts`), which re-validates, checks the honeypot, then forwards to
+Web3Forms server-side. The access key stays on the server and never ships to the client.
+With no key, the form still validates but returns a friendly "please email us" message
+instead of sending.
 
-Set `ENQUIRY_NOTIFICATIONS_ENABLED=true` and `RESEND_API_KEY=...` to email
-`ENQUIRY_NOTIFICATION_TO` on each new enquiry. It is fully optional and never blocks or
-fails a submission. With no key, nothing is sent.
+> Note: this is email-only, so there is no saved record if an email ever bounces or is
+> spam-filtered (Web3Forms keeps a copy in its own dashboard). For a few enquiries a week
+> that's fine. If you later want enquiries persisted to a database too, that's a small
+> addition.
 
 ---
 
@@ -83,8 +77,9 @@ fails a submission. With no key, nothing is sent.
 
 1. Push this repo to GitHub.
 2. Import it into Vercel (framework auto-detected as Next.js).
-3. Add the environment variables from `.env.example` in the Vercel project settings.
-   Set `NEXT_PUBLIC_SITE_URL` to your deployment URL.
+3. Add the environment variables from `.env.example` in the Vercel project settings
+   (`NEXT_PUBLIC_SITE_URL` and `WEB3FORMS_ACCESS_KEY`). Set `NEXT_PUBLIC_SITE_URL` to your
+   deployment URL.
 4. Deploy. No custom domain is required; everything is domain-agnostic. When
    `chefpskitchen.co.uk` is ready, point it at the Vercel project and update
    `NEXT_PUBLIC_SITE_URL`.
@@ -100,13 +95,12 @@ src/
     globals.css           design tokens (light/dark), motion tokens, reveal + hero CSS
     page.tsx              home (signature hero, intro, events, dishes, how-it-works, CTA)
     menu/ events/ about/ enquire/   the inner pages
-    api/enquiry/route.ts  POST handler -> validate -> Supabase insert -> optional email
+    api/enquiry/route.ts  POST handler -> validate -> honeypot -> forward to Web3Forms
     sitemap.ts robots.ts manifest.ts
   components/             Header, Footer, Hero, ThemeToggle, Reveal, DishCard, EnquiryForm, ...
   data/                   menu.ts, events.ts, dishes.ts (content)
-  lib/                    site config, enquiry schema (zod), supabase-server, notify, cn
+  lib/                    site config, enquiry schema (zod), cn
 public/brand/             extracted brand assets (+ README on how they were made)
-supabase/migrations/      enquiries table + RLS
 brand-source/             the source brand PDF
 PLAN.md                   the approved design/build plan
 .claude/skills/           ui-ux-pro-max + Emil Kowalski animation skills used in the build

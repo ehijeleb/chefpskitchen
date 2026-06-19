@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { enquirySchema, flattenFieldErrors } from "@/lib/enquiry";
-import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase-server";
-import { sendEnquiryNotification } from "@/lib/notify";
 
 export const runtime = "nodejs";
+
+/** Enquiry handler. Validates server-side, then forwards to Web3Forms, which
+ *  emails the enquiry to the inbox tied to WEB3FORMS_ACCESS_KEY. No database.
+ *  The key is read server-side so the client never has to carry it, and we get
+ *  our own validation, honeypot and response shape on top of Web3Forms. */
+
+const WEB3FORMS_ENDPOINT = "https://api.web3forms.com/submit";
 
 export async function POST(request: Request) {
   let payload: unknown;
@@ -29,7 +34,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  if (!isSupabaseConfigured()) {
+  const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
+  if (!accessKey) {
     return NextResponse.json(
       {
         ok: false,
@@ -41,36 +47,42 @@ export async function POST(request: Request) {
   }
 
   try {
-    const supabase = getSupabaseAdmin();
-    const { error } = await supabase.from("enquiries").insert({
-      name: data.name,
-      email: data.email,
-      phone: data.phone || null,
-      event_type: data.eventType,
-      event_date: data.eventDate || null,
-      guest_count: typeof data.guestCount === "number" ? data.guestCount : null,
-      location: data.location || null,
-      message: data.message,
-      source: "website",
+    const res = await fetch(WEB3FORMS_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        access_key: accessKey,
+        subject: `New enquiry — ${data.eventType} — ${data.name}`,
+        from_name: "Chef P's Kitchen website",
+        // Web3Forms uses the `email` field as the reply-to address.
+        name: data.name,
+        email: data.email,
+        phone: data.phone || "Not given",
+        event_type: data.eventType,
+        event_date: data.eventDate || "Not given",
+        guest_count: typeof data.guestCount === "number" ? data.guestCount : "Not given",
+        location: data.location || "Not given",
+        message: data.message,
+        // Web3Forms' own honeypot, in addition to ours.
+        botcheck: "",
+      }),
     });
 
-    if (error) {
-      console.error("Supabase insert failed:", error);
+    const result = await res.json().catch(() => ({}));
+    if (!res.ok || !result.success) {
+      console.error("Web3Forms submit failed:", res.status, result);
       return NextResponse.json(
-        { ok: false, error: "Something went wrong saving your enquiry. Please try again." },
-        { status: 500 },
+        { ok: false, error: "Something went wrong sending your enquiry. Please try again." },
+        { status: 502 },
       );
     }
   } catch (err) {
     console.error("Enquiry handler threw:", err);
     return NextResponse.json(
-      { ok: false, error: "Something went wrong saving your enquiry. Please try again." },
+      { ok: false, error: "Something went wrong sending your enquiry. Please try again." },
       { status: 500 },
     );
   }
-
-  // Fire-and-forget; email never blocks or fails the response.
-  await sendEnquiryNotification(data);
 
   return NextResponse.json({ ok: true });
 }
