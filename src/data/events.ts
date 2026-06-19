@@ -15,7 +15,7 @@ export const EVENT_TYPES: EventType[] = [
     title: "Private Dining & Dinner Parties",
     tagline: "Your table, our kitchen",
     description:
-      "An evening built around your people. We cook everything fresh in our home kitchen and bring it to yours, from an intimate supper for six to a long table that runs late. Think jollof arancini to start, ayamase lamb shank to remember.",
+      "An evening built around your people. We cook everything fresh in our home kitchen and bring it to yours, from an intimate supper for six to a long table that runs late. Think suya skewers to start, ofada rice and ayamase to remember.",
     includes: [
       "A menu shaped around your guests and the occasion",
       "Fresh-cooked, plated with care",
@@ -51,7 +51,7 @@ export const EVENT_TYPES: EventType[] = [
     title: "Pop-ups & Markets",
     tagline: "Catch us in the wild",
     description:
-      "Markets, supper clubs and one-off pop-ups where we cook for a crowd and let the flavours do the talking. Puff puff sundaes, moi moi custards, miso suya salmon and whatever the season is asking for.",
+      "Markets, supper clubs and one-off pop-ups where we cook for a crowd and let the flavours do the talking. Puff puff, asun, smoky party jollof and whatever the season is asking for.",
     includes: [
       "A tight, punchy menu built for the format",
       "Crowd-friendly Afrofusion small plates",

@@ -10,23 +10,23 @@ export type SignatureDish = {
 
 export const SIGNATURE_DISHES: SignatureDish[] = [
   {
-    name: "Chef P's Signature Jollof",
-    description: "Fire-smoked jollof rice with grilled chicken supreme.",
-    category: "The one we are known for",
+    name: "Party Jollof Rice",
+    description: "Smoky, party-style jollof cooked down over open flame. The dish everyone comes back for.",
+    category: "The one we're known for",
   },
   {
-    name: "Ayamase Lamb Shank",
-    description: "Slow-braised lamb shank in designer green pepper sauce.",
-    category: "Signature main",
+    name: "Suya Skewers",
+    description: "Thin beef skewers crusted in yaji groundnut spice, with raw onion and tomato.",
+    category: "Small chops",
   },
   {
-    name: "Jollof Arancini",
-    description: "Crispy jollof rice bites with smoked pepper aioli.",
-    category: "Starter",
+    name: "Ofada Rice & Ayamase",
+    description: "Local ofada rice with smoky ayamase, the green pepper and palm oil designer stew.",
+    category: "Signature",
   },
   {
-    name: "Miso Suya Salmon",
-    description: "Glazed salmon with spiced sweet potato purée.",
-    category: "Afrofusion",
+    name: "Jerk Chicken",
+    description: "Marinated in scotch bonnet and pimento, grilled over heat.",
+    category: "Caribbean corner",
   },
 ];

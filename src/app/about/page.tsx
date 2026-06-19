@@ -46,10 +46,11 @@ export default function AboutPage() {
             </Reveal>
             <Reveal delay={40}>
               <p>
-                Afrofusion, to us, means honouring those roots while plating them with a little
-                modern flair. Jollof becomes crisp arancini. Ayamase slow-cooks down over a lamb
-                shank. Suya finds its way onto salmon. The flavours stay true, the presentation
-                grows up a little. Traditional heart, elevated finish.
+                Afrofusion, to us, is a Nigerian kitchen with Caribbean touches. Smoky party
+                jollof cooked over open flame. Egusi made the long way, with stockfish and
+                assorted meat. Suya crusted in yaji, jerk chicken next to curry goat, small chops
+                that disappear before they reach the table. The flavours stay true to how we were
+                taught, cooked fresh to order, never mass-produced.
               </p>
             </Reveal>
           </div>

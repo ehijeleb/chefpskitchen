@@ -4,12 +4,12 @@ import { Reveal } from "@/components/reveal";
 import { MenuGroup } from "@/components/menu-group";
 import { CtaBand } from "@/components/sections";
 import { ButtonLink } from "@/components/ui";
-import { MENU } from "@/data/menu";
+import { MENU, DIETARY_KEY, MENU_INTRO, MENU_DIETARY_NOTE, MENU_CLOSING } from "@/data/menu";
 
 export const metadata: Metadata = {
   title: "Sample menu",
   description:
-    "A taste of Chef P's Kitchen: Afrofusion small plates, signature mains, sides, drinks and desserts. Every menu is built bespoke for your event.",
+    "A taste of Chef P's Kitchen: small chops, party jollof, soups and swallow, Caribbean classics and more. A Nigerian kitchen with Caribbean touches. Every menu is built bespoke for your event.",
   alternates: { canonical: "/menu" },
 };
 
@@ -24,8 +24,26 @@ export default function MenuPage() {
               as="h1"
               eyebrow="Sample menu"
               title="A starting point, not a set menu"
-              intro="This is a taste of what we do. Every event menu is built bespoke around you, your guests and the occasion, so treat these as inspiration rather than a fixed list."
+              intro={MENU_INTRO}
             />
+            <p className="mt-6 rounded-lg border border-border bg-surface-raised px-5 py-4 font-medium text-ink">
+              {MENU_DIETARY_NOTE}
+            </p>
+
+            {/* dietary key legend */}
+            <div className="mt-6">
+              <Eyebrow>Key</Eyebrow>
+              <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+                {DIETARY_KEY.map((d) => (
+                  <li key={d.code} className="flex items-center gap-2 text-sm text-ink-muted">
+                    <span className="rounded-full border border-border-strong px-1.5 py-px text-[0.625rem] font-semibold uppercase tracking-wide text-ink-muted">
+                      {d.code}
+                    </span>
+                    {d.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </Reveal>
         </Container>
       </section>
@@ -44,8 +62,8 @@ export default function MenuPage() {
                       <Eyebrow>Made for you</Eyebrow>
                       <p className="mx-auto mt-3 max-w-2xl font-display text-xl leading-snug sm:text-2xl">
                         Love something here, or fancy something that isn't? We build every menu
-                        from scratch for your event. Dietary needs, favourite dishes, a theme to
-                        hit, just tell us.
+                        from scratch for your event. Halal meat, dietary needs, favourite dishes,
+                        a theme to hit, just tell us.
                       </p>
                       <ButtonLink href="/enquire" className="mt-6">
                         Build your menu with us
@@ -56,6 +74,11 @@ export default function MenuPage() {
               </div>
             ))}
           </div>
+
+          {/* closing note */}
+          <Reveal className="mx-auto mt-16 max-w-3xl border-t border-border pt-8 text-center">
+            <p className="text-lg italic leading-relaxed text-ink-muted">{MENU_CLOSING}</p>
+          </Reveal>
         </Container>
       </section>
 
