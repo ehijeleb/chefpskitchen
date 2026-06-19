@@ -217,7 +217,7 @@ export function EnquiryForm() {
             id="eventType"
             name="eventType"
             required
-            className={cn(inputClass, "appearance-none bg-[length:0] pr-9")}
+            className={cn(inputClass, "cursor-pointer pr-9")}
             aria-invalid={!!errorFor("eventType")}
             aria-describedby={errorFor("eventType") ? "eventType-error" : undefined}
             value={values.eventType}

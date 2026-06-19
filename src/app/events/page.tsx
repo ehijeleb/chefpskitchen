@@ -20,7 +20,7 @@ export default function EventsPage() {
         <Container className="py-14 sm:py-16">
           <Image
             src="/brand/catering-lockup.png"
-            alt="Chef P's Kitchen — Catering & Events"
+            alt="Chef P's Kitchen · Catering & Events"
             width={2000}
             height={840}
             priority
