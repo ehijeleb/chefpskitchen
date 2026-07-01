@@ -11,12 +11,8 @@ export const SITE = {
   taglineTriad: "Flavour. Heritage. Heart.",
   description:
     "Nigerian and Caribbean home catering. Afrofusion food cooked fresh from family recipes for private dining, corporate events, weddings and pop-ups.",
-  email: "hello@chefpskitchen.co.uk",
-  social: "@chefpskitchen",
-  instagramUrl: "https://instagram.com/chefpskitchen",
-  // TODO: replace with the real number. The brand PDF only shows a placeholder.
-  phone: "07XXX XXX XXX",
-  phoneIsPlaceholder: true,
+  email: "eat@chefpkitchen.com",
+  phone: "+44 7815 600961",
 } as const;
 
 /** Public base URL, no trailing slash. Falls back to localhost for dev. */

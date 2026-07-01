@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Instagram, Mail, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { Container, Eyebrow, SectionHeading } from "@/components/ui";
 import { Reveal } from "@/components/reveal";
 import { EnquiryForm } from "@/components/enquiry-form";
@@ -71,19 +71,12 @@ export default function EnquirePage() {
                       {SITE.email}
                     </a>
                     <a
-                      href={SITE.instagramUrl}
+                      href={`tel:${SITE.phone.replace(/\s+/g, "")}`}
                       className="flex items-center gap-3 text-ink transition-colors hover:text-accent-text"
                     >
-                      <Instagram className="size-4 shrink-0 text-accent-text" aria-hidden />
-                      {SITE.social}
-                    </a>
-                    <span className="flex items-center gap-3 text-ink">
                       <Phone className="size-4 shrink-0 text-accent-text" aria-hidden />
                       {SITE.phone}
-                      {SITE.phoneIsPlaceholder ? (
-                        <span className="text-xs text-ink-muted">(placeholder)</span>
-                      ) : null}
-                    </span>
+                    </a>
                   </div>
                 </div>
               </aside>

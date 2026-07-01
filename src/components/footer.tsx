@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Instagram, Mail, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { NAV_LINKS, SITE } from "@/lib/site";
 import { Stamp } from "@/components/brand";
 
@@ -58,19 +58,12 @@ export function Footer() {
             {SITE.email}
           </a>
           <a
-            href={SITE.instagramUrl}
+            href={`tel:${SITE.phone.replace(/\s+/g, "")}`}
             className="flex w-fit items-center gap-2 text-ink-muted transition-colors hover:text-accent-text"
           >
-            <Instagram className="size-4 shrink-0" aria-hidden />
-            {SITE.social}
-          </a>
-          <span className="flex w-fit items-center gap-2 text-ink-muted">
             <Phone className="size-4 shrink-0" aria-hidden />
             {SITE.phone}
-            {SITE.phoneIsPlaceholder ? (
-              <span className="text-xs text-ink-muted/70">{/* TODO: real number */}(placeholder)</span>
-            ) : null}
-          </span>
+          </a>
         </div>
       </div>
 
