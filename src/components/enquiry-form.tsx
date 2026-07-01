@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui";
 import { SwooshDivider } from "@/components/brand";
 import { cn } from "@/lib/cn";
+import { SITE } from "@/lib/site";
 
 type Values = Record<keyof EnquiryInput, string>;
 
@@ -91,7 +92,7 @@ export function EnquiryForm() {
     const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
     if (!accessKey) {
       setServerError(
-        "The enquiry form isn't connected yet. Please email hello@chefpskitchen.co.uk and we'll get right back to you.",
+        `The enquiry form isn't connected yet. Please email ${SITE.email} and we'll get right back to you.`,
       );
       setStatus("error");
       return;
@@ -128,12 +129,12 @@ export function EnquiryForm() {
         return;
       }
       setServerError(
-        "Something went wrong sending your enquiry. Please try again, or email hello@chefpskitchen.co.uk.",
+        `Something went wrong sending your enquiry. Please try again, or email ${SITE.email}.`,
       );
       setStatus("error");
     } catch {
       setServerError(
-        "We couldn't reach the server. Please check your connection and try again, or email hello@chefpskitchen.co.uk.",
+        `We couldn't reach the server. Please check your connection and try again, or email ${SITE.email}.`,
       );
       setStatus("error");
     }
@@ -153,7 +154,7 @@ export function EnquiryForm() {
         <p className="max-w-md text-lg leading-relaxed text-ink-muted">
           A real person will read it and come back to you within{" "}
           {/* TODO: confirm real lead time */}a couple of days with ideas for your event. In the
-          meantime, you can reply to our email any time at hello@chefpskitchen.co.uk.
+          meantime, you can reply to our email any time at {SITE.email}.
         </p>
       </div>
     );

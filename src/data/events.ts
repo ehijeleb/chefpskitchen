@@ -55,7 +55,7 @@ export const EVENT_TYPES: EventType[] = [
     includes: [
       "A tight, punchy menu built for the format",
       "Crowd-friendly Afrofusion small plates",
-      "Follow @chefpskitchen for where we land next",
+      "Get in touch to hear where we land next",
     ],
   },
 ];
